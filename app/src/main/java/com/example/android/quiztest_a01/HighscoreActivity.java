@@ -1,5 +1,6 @@
 package com.example.android.quiztest_a01;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -7,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -24,6 +26,8 @@ public class HighscoreActivity extends AppCompatActivity {
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mHighscoreDatabaseReference;
     private ChildEventListener mChildEventListener;
+
+    String mUsername;
 
     // for display all the highscore views
     private ListView mHighscoreListView;
@@ -43,18 +47,23 @@ public class HighscoreActivity extends AppCompatActivity {
         // this Button will retrieve the user's name and generate a random highscore
         fakeHighscoreButton = findViewById(R.id.fake_highscore_button);
 
+        Intent mIntent = getIntent();
+        mUsername = mIntent.getStringExtra("username");
+
         // when clicked it generates a fake highscore
         fakeHighscoreButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // generating a fake highscore points
-                String newHighscore = Integer.toString((int) Math.random());
+                int newHighscore = (int) (Math.random() * 101);
 
                 // create a new highscore messagge with fake points and user's name
-                HighscoreMessage highscoreMessage = new HighscoreMessage(newHighscore, MainActivity.mUsername, null);
+                HighscoreMessage highscoreMessage = new HighscoreMessage(mUsername, newHighscore);
 
                 // push it to the database
                 mHighscoreDatabaseReference.push().setValue(highscoreMessage);
+
+                Toast.makeText(HighscoreActivity.this, mUsername + " " + newHighscore, Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -73,10 +82,8 @@ public class HighscoreActivity extends AppCompatActivity {
         mChildEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
                 HighscoreMessage highScoreMessage = dataSnapshot.getValue(HighscoreMessage.class);
                 mHighscoreAdapter.add(highScoreMessage);
-
             }
 
             @Override

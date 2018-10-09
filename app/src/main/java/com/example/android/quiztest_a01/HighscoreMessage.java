@@ -7,13 +7,16 @@ public class HighscoreMessage {
      * username will be retrieved with user login ID
      */
     private String username;
-    private String highscore;
+    private int highscore;
     private String photoUrl;
+
+    public HighscoreMessage() {
+    }
 
     /* An highscore message must need an username and a score
      * I currently don't know if the highscore data should be String like now or change to int
      */
-    public HighscoreMessage(String username, String highscore) {
+    public HighscoreMessage(String username, int highscore) {
         this.username = username;
         this.highscore = highscore;
     }
@@ -25,7 +28,7 @@ public class HighscoreMessage {
      * @param highscore
      * @param photoUrl  this will need to be add in the future
      */
-    public HighscoreMessage(String username, String highscore, String photoUrl) {
+    public HighscoreMessage(String username, int highscore, String photoUrl) {
         this.username = username;
         this.highscore = highscore;
         this.photoUrl = photoUrl;
@@ -39,11 +42,11 @@ public class HighscoreMessage {
         this.username = username;
     }
 
-    public String getHighscore() {
+    public int getHighscore() {
         return highscore;
     }
 
-    public void setHighscore(String highscore) {
+    public void setHighscore(int highscore) {
         this.highscore = highscore;
     }
 

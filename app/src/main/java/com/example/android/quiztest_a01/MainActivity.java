@@ -9,6 +9,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
@@ -22,12 +23,15 @@ import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
 
+    Button playButton;
     Button highscoreButton;
+    TextView userLoginName;
 
     public static final String ANONYMOUS = "anonymous";
     // Choose an arbitrary request code value
     private static final int RC_SIGN_IN = 123;
     public static String mUsername;
+
     /* Those are needed to authenticate the user
      * I dont' know if it's better to do it like this or open a pop up window
      * or something else.. I just leave here the code
@@ -43,14 +47,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mUsername = ANONYMOUS;
-
         // getting the database
         mFirebaseDatabase = FirebaseDatabase.getInstance();
 
         // getting the Authentication
         mFirebaseAuth = FirebaseAuth.getInstance();
 
+        userLoginName = findViewById(R.id.user_login_name_textview);
         highscoreButton = findViewById(R.id.highscore_button);
 
         // I'll just start the HighscoreActivity like this to test it out
@@ -58,6 +61,19 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent myIntent = new Intent(MainActivity.this, HighscoreActivity.class);
+                myIntent.putExtra("username", mUsername);
+                MainActivity.this.startActivity(myIntent);
+            }
+        });
+
+        playButton = findViewById(R.id.play_button);
+
+        // I'll just start the HighscoreActivity like this to test it out
+        playButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent myIntent = new Intent(MainActivity.this, PlayActivity.class);
+                myIntent.putExtra("username", mUsername);
                 MainActivity.this.startActivity(myIntent);
             }
         });
@@ -69,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     // user is signed in
-                    Toast.makeText(MainActivity.this, "You're now signed in", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(MainActivity.this, "You're now signed in", Toast.LENGTH_SHORT).show();
                     onSignedInInitialize(user.getDisplayName());
                 } else {
                     /* user is not signed in
@@ -81,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
                     startActivityForResult(
                             AuthUI.getInstance()
                                     .createSignInIntentBuilder()
+                                    .setIsSmartLockEnabled(false)
                                     .setAvailableProviders(Arrays.asList(
                                             /*new AuthUI.IdpConfig.FacebookBuilder().build(),*/
                                             new AuthUI.IdpConfig.GoogleBuilder().build(),
@@ -123,9 +140,7 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) {
-                startActivity(new Intent(this, MainActivity.class));
                 Toast.makeText(this, "Signed in!", Toast.LENGTH_SHORT).show();
-
             } else if (resultCode == RESULT_CANCELED) {
                 Toast.makeText(this, "Signed in canceled", Toast.LENGTH_SHORT).show();
                 finish();
@@ -137,8 +152,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
-        mUsername = ANONYMOUS;
+        if (mAuthStateListener != null) {
+            mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
+        }
+        //mUsername = ANONYMOUS;
     }
 
     // if the app will open again this will add the listener
@@ -148,11 +165,31 @@ public class MainActivity extends AppCompatActivity {
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
     }
 
+    // get the username from login and set it to the userLoginName TextView
     public void onSignedInInitialize(String username) {
         mUsername = username;
+        userLoginName.setText(mUsername);
     }
 
+    // set the username ANONYMOUS and set it to the userLoginName TextView
     public void onSignedOutCleanUp() {
         mUsername = ANONYMOUS;
+        userLoginName.setText(mUsername);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // We will start writing our code here.
+    }
+
+    private void connected() {
+        // Then we will write some more code here.
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // Aaand we will finish off here.
     }
 }

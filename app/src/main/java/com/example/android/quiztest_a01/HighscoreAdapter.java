@@ -26,6 +26,12 @@ public class HighscoreAdapter extends ArrayAdapter<HighscoreMessage> {
 
         HighscoreMessage highscore = getItem(position);
 
+        if (highscore.getUsername() != null) {
+            usernameTextView.setText(highscore.getUsername());
+        }
+
+        highscoreTextView.setText("" + highscore.getHighscore());
+
         boolean isPhoto = highscore.getPhotoUrl() != null;
 
         if (isPhoto) {
